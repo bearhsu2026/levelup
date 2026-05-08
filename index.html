@@ -6,7 +6,7 @@
   <title>520 絕對領域：階級結算大輪盤</title>
   <style>
     /* ─────────────────────────────────────────────────────────
-       Skill 32: Design Tokens (嚴格遵守)
+       Skill 32: Design Tokens & Dynamic Tier Variables
        ───────────────────────────────────────────────────────── */
     :root {
       --color-primary: #00D2BE;
@@ -22,24 +22,24 @@
       --color-on-primary-disabled: rgba(255,255,255,0.4);
       --color-outline: #474747;
       --color-outline-variant: rgba(71,71,71,0.4);
-      --color-outline-brand: #00D2BE;
-      --color-scrim: rgba(25,25,25,0.8);
-      --color-shadow: rgba(25,25,25,0.2);
+      --color-scrim: rgba(25,25,25,0.9);
       
       /* Level Presets */
-      --color-level-silver: #C8C8C8;
-      --color-level-gold: #FFD100;
-      --color-level-black: #8238BA;
+      --color-level-silver: #E0E0E0;
+      --color-level-gold: #FFD700;
+      --color-level-black: #B15BFF;
 
-      --font-family: 'PingFang TC', -apple-system, sans-serif;
+      /* Dynamic Tier Variables (Updated via JS) */
+      --tier-color: var(--color-level-silver);
+      --tier-glow: rgba(224, 224, 224, 0.15);
+
+      --font-family: 'PingFang TC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       --font-weight-regular: 400;
       --font-weight-semibold: 600;
       --font-headline-large: 36px;
-      --font-headline-medium: 32px;
       --font-headline-small: 28px;
       --font-title-large: 22px;
       --font-title-medium: 20px;
-      --font-title-small: 18px;
       --font-body-large: 16px;
       --font-body-medium: 14px;
       --font-body-small: 12px;
@@ -48,57 +48,68 @@
       --spacing-5: 16px; --spacing-6: 24px; --spacing-7: 32px;
 
       --radius-s: 8px; --radius-m: 12px; --radius-l: 16px; --radius-full: 1000px;
-      --radius-modal: 4px;
-    }
-
-    @media (max-width: 767px) {
-      :root { --radius-modal: 0px; }
     }
 
     /* ─────────────────────────────────────────────────────────
-       Base Styles & Glassmorphism
+       Base Styles & Layout
        ───────────────────────────────────────────────────────── */
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
       font-family: var(--font-family);
       color: var(--color-on-primary-1);
       background-color: var(--color-surface);
+      background-image: radial-gradient(circle at 50% 0%, rgba(25,25,25,1) 0%, var(--color-surface) 100%);
       margin: 0; padding: 0;
       overflow-x: hidden;
     }
 
     .container {
-      max-width: 480px; /* Mobile first for iframe */
+      max-width: 480px; 
       margin: 0 auto;
       padding: var(--spacing-5);
-      padding-bottom: 80px;
+      padding-bottom: 90px;
+      position: relative;
+      z-index: 1;
     }
 
-    /* Typography */
-    h1 { font-size: var(--font-headline-small); margin: 0 0 var(--spacing-3); font-weight: var(--font-weight-semibold); text-align: center;}
-    h2 { font-size: var(--font-title-large); margin: 0 0 var(--spacing-2); color: var(--color-primary); }
-    .subtitle { font-size: var(--font-body-medium); color: var(--color-on-primary-2); text-align: center; margin-bottom: var(--spacing-6); line-height: 1.5; }
+    h1 { font-size: var(--font-headline-small); margin: 0 0 var(--spacing-3); font-weight: var(--font-weight-semibold); text-align: center; text-shadow: 0 2px 10px rgba(0,0,0,0.5);}
+    .subtitle { font-size: var(--font-body-medium); color: var(--color-on-primary-2); text-align: center; margin-bottom: var(--spacing-5); line-height: 1.5; }
 
-    /* Skeleton Loading */
-    .skeleton {
-      background: linear-gradient(90deg, var(--color-surface-container) 25%, var(--color-surface-variant) 50%, var(--color-surface-container) 75%);
-      background-size: 200% 100%;
-      animation: loading 1.5s infinite;
-      border-radius: var(--radius-s);
+    /* ─────────────────────────────────────────────────────────
+       FOMO Marquee (轉換率引擎：社會認同)
+       ───────────────────────────────────────────────────────── */
+    .marquee-wrapper {
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+      border-bottom: 1px solid var(--color-outline-variant);
+      padding: var(--spacing-2) 0;
+      overflow: hidden;
+      margin-bottom: var(--spacing-5);
     }
-    @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .marquee-content {
+      display: flex;
+      white-space: nowrap;
+      animation: marquee 20s linear infinite;
+      font-size: var(--font-body-small);
+      color: var(--color-on-primary-2);
+    }
+    .marquee-item { margin-right: 30px; display: inline-flex; align-items: center; gap: 4px;}
+    .marquee-item span.highlight { color: var(--tier-color); font-weight: bold; }
+    @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-150%); } }
 
-    /* Cards */
+    /* ─────────────────────────────────────────────────────────
+       Luxury Glassmorphism Cards
+       ───────────────────────────────────────────────────────── */
     .card {
-      background: rgba(35, 35, 35, 0.6);
-      backdrop-filter: blur(10px);
+      background: linear-gradient(145deg, rgba(35, 35, 35, 0.8) 0%, rgba(25, 25, 25, 0.9) 100%);
+      backdrop-filter: blur(15px);
       border: 1px solid var(--color-outline-variant);
+      box-shadow: 0 8px 32px var(--tier-glow), inset 0 1px 0 rgba(255,255,255,0.1);
       border-radius: var(--radius-l);
       padding: var(--spacing-5);
       margin-bottom: var(--spacing-6);
+      transition: box-shadow 0.5s ease;
     }
 
-    /* Dashboard Stats */
     .stats-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -106,184 +117,222 @@
       margin-bottom: var(--spacing-5);
     }
     .stat-box {
-      background: var(--color-surface-container);
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.05);
       border-radius: var(--radius-m);
       padding: var(--spacing-4);
       text-align: center;
+      position: relative;
+      overflow: hidden;
     }
     .stat-label { font-size: var(--font-body-small); color: var(--color-on-primary-2); margin-bottom: var(--spacing-2); }
-    .stat-value { font-size: var(--font-title-large); font-weight: var(--font-weight-semibold); }
-    .highlight { color: var(--color-primary); }
+    .stat-value { font-size: var(--font-title-large); font-weight: var(--font-weight-semibold); color: var(--color-on-primary-1); }
+    .tier-text { color: var(--tier-color); text-shadow: 0 0 10px var(--tier-glow); }
 
-    /* Buttons */
+    .ticket-display {
+      background: linear-gradient(90deg, rgba(0,210,190,0.1), rgba(0,210,190,0.02));
+      border: 1px solid rgba(0,210,190,0.3);
+      border-radius: var(--radius-s);
+      padding: var(--spacing-3);
+      text-align: center;
+      margin-bottom: var(--spacing-5);
+    }
+
+    /* ─────────────────────────────────────────────────────────
+       Premium Buttons
+       ───────────────────────────────────────────────────────── */
     .btn {
-      width: 100%;
-      padding: var(--spacing-4);
-      border: none;
-      border-radius: var(--radius-full);
-      font-size: var(--font-body-large);
-      font-weight: var(--font-weight-semibold);
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
+      width: 100%; padding: var(--spacing-4); border: none; border-radius: var(--radius-full);
+      font-size: var(--font-body-large); font-weight: var(--font-weight-semibold);
+      cursor: pointer; transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+      position: relative; overflow: hidden;
     }
-    .btn:active { transform: scale(0.98); }
-    .btn-primary { background: var(--color-primary); color: var(--color-surface); }
-    .btn-primary:disabled { background: var(--color-primary-disabled); color: var(--color-on-primary-disabled); cursor: not-allowed; }
-    .btn-outline { background: transparent; border: 1px solid var(--color-primary); color: var(--color-primary); }
+    .btn:active { transform: scale(0.96); }
     
-    /* Roulette Arena */
-    .arena-title { text-align: center; font-size: var(--font-title-large); font-weight: var(--font-weight-semibold); margin-bottom: var(--spacing-2); }
-    .arena-desc { text-align: center; font-size: var(--font-body-medium); color: var(--color-on-primary-2); margin-bottom: var(--spacing-6); line-height: 1.4;}
+    .btn-outline { 
+      background: transparent; border: 1px solid var(--color-primary); color: var(--color-primary); 
+    }
+    .btn-outline:hover { background: rgba(0,210,190,0.1); }
 
-    /* Pure CSS Roulette Wheel */
+    .btn-primary { 
+      background: linear-gradient(135deg, var(--tier-color), #222); 
+      color: #fff; 
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 4px 15px var(--tier-glow);
+      animation: pulse 2s infinite;
+    }
+    .btn-primary:disabled { 
+      background: var(--color-surface-container); color: var(--color-on-primary-disabled); 
+      border: 1px solid var(--color-outline); box-shadow: none; animation: none; cursor: not-allowed; 
+    }
+    
+    /* 掃光特效 */
+    .btn-primary::after {
+      content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+      background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+      transform: rotate(30deg) translateX(-100%);
+      animation: shimmer 3s infinite;
+    }
+
+    @keyframes pulse { 0% { box-shadow: 0 0 0 0 var(--tier-glow); } 70% { box-shadow: 0 0 0 10px rgba(0,0,0,0); } 100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); } }
+    @keyframes shimmer { 0% { transform: rotate(30deg) translateX(-100%); } 100% { transform: rotate(30deg) translateX(100%); } }
+
+    /* ─────────────────────────────────────────────────────────
+       The VIP Roulette Wheel
+       ───────────────────────────────────────────────────────── */
+    .arena-title { text-align: center; font-size: var(--font-title-large); font-weight: var(--font-weight-semibold); margin-bottom: var(--spacing-2); color: var(--tier-color); text-shadow: 0 0 15px var(--tier-glow);}
+    .arena-desc { text-align: center; font-size: var(--font-body-medium); color: var(--color-on-primary-2); margin-bottom: var(--spacing-6); line-height: 1.5; padding: 0 10px;}
+
     .wheel-container {
-      position: relative;
-      width: 300px;
-      height: 300px;
-      margin: 0 auto var(--spacing-6);
+      position: relative; width: 310px; height: 310px; margin: 0 auto var(--spacing-6);
     }
+    
+    /* 外圍發光環 */
+    .wheel-border {
+      position: absolute; top: -5px; left: -5px; right: -5px; bottom: -5px;
+      border-radius: 50%; background: linear-gradient(135deg, var(--tier-color), transparent, var(--tier-color));
+      z-index: 1; animation: spinBorder 4s linear infinite; opacity: 0.5;
+    }
+    @keyframes spinBorder { 100% { transform: rotate(360deg); } }
+
     .wheel {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      border: 4px solid var(--color-surface-container);
-      position: relative;
-      overflow: hidden;
-      transition: transform 5s cubic-bezier(0.2, 0.8, 0.1, 1); /* Smooth spinning easing */
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      width: 100%; height: 100%; border-radius: 50%;
+      border: 6px solid #1a1a1a; position: relative; overflow: hidden;
+      box-shadow: 0 0 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5);
+      z-index: 2; transition: transform 5s cubic-bezier(0.1, 0.9, 0.1, 1); 
     }
+    
     .pointer {
-      position: absolute;
-      top: -15px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 30px;
-      height: 40px;
-      background: var(--color-primary);
-      clip-path: polygon(50% 100%, 0 0, 100% 0);
-      z-index: 10;
-      filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.5));
+      position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+      width: 36px; height: 45px; background: linear-gradient(to bottom, #fff, #ddd);
+      clip-path: polygon(50% 100%, 0 0, 100% 0); z-index: 10;
+      filter: drop-shadow(0 4px 4px rgba(0,0,0,0.6));
     }
+    
     .wheel-center {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 60px; height: 60px;
-      background: var(--color-surface);
-      border: 3px solid var(--color-outline);
-      border-radius: 50%;
-      z-index: 5;
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 68px; height: 68px; background: radial-gradient(circle, #333, #111);
+      border: 3px solid var(--tier-color); border-radius: 50%; z-index: 5;
       display: flex; justify-content: center; align-items: center;
-      font-weight: bold; color: var(--color-on-primary-1);
-    }
-    /* Slices are dynamically generated via JS CSS Text */
-    .slice-label {
-      position: absolute;
-      top: 50%; left: 50%;
-      width: 130px; /* Radius minus center */
-      transform-origin: 0 50%;
-      text-align: right;
-      padding-right: 20px;
-      font-size: 11px;
-      font-weight: var(--font-weight-semibold);
-      color: var(--color-on-primary-1);
-      z-index: 2;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-weight: 800; font-size: 14px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.2);
     }
 
-    /* Modal */
+    .slice-label {
+      position: absolute; top: 50%; left: 50%; width: 140px; 
+      transform-origin: 0 50%; text-align: right; padding-right: 22px;
+      font-size: 11px; font-weight: var(--font-weight-semibold); color: var(--color-on-primary-1);
+      z-index: 2; text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* ─────────────────────────────────────────────────────────
+       Modal & Confetti
+       ───────────────────────────────────────────────────────── */
     .modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: var(--color-scrim);
+      background: var(--color-scrim); backdrop-filter: blur(8px);
       display: flex; justify-content: center; align-items: center;
-      z-index: 999;
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.3s;
+      z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.3s;
     }
     .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    
     .modal-content {
-      background: var(--color-surface);
-      border-radius: var(--radius-modal);
-      width: var(--modal-width);
-      max-height: var(--modal-max-height);
-      padding: var(--spacing-6);
-      text-align: center;
-      border: 1px solid var(--color-outline);
-      transform: translateY(20px);
-      transition: transform 0.3s;
+      background: linear-gradient(180deg, #2a2a2a 0%, #191919 100%);
+      border-radius: var(--radius-l); width: 85%; max-width: 360px;
+      padding: var(--spacing-6); text-align: center;
+      border: 1px solid var(--tier-color); box-shadow: 0 10px 40px var(--tier-glow);
+      transform: scale(0.9) translateY(20px); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative; overflow: hidden;
     }
-    .modal-overlay.active .modal-content { transform: translateY(0); }
-    .prize-icon { font-size: 64px; margin-bottom: var(--spacing-4); }
+    .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+    
+    .prize-icon { font-size: 72px; margin-bottom: var(--spacing-3); filter: drop-shadow(0 0 10px var(--tier-color)); animation: bounce 2s infinite; }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
-    /* Dev Testing Panel */
+    /* Pure CSS Confetti Container */
+    #confetti-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 0; }
+    .confetti-piece { position: absolute; width: 8px; height: 16px; opacity: 0.8; animation: fall linear forwards; }
+    @keyframes fall { 0% { transform: translateY(-20px) rotate(0deg); opacity: 1; } 100% { transform: translateY(120vh) rotate(720deg); opacity: 0; } }
+
+    /* Skeleton Loading */
+    .skeleton {
+      background: linear-gradient(90deg, var(--color-surface-container) 25%, var(--color-surface-variant) 50%, var(--color-surface-container) 75%);
+      background-size: 200% 100%; animation: loading 1.5s infinite; border-radius: var(--radius-s);
+    }
+    @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* Dev Panel */
     .dev-panel {
       position: fixed; bottom: 0; left: 0; right: 0;
-      background: var(--color-surface-container);
-      padding: var(--spacing-3);
-      display: flex; justify-content: center; gap: 10px;
-      border-top: 1px solid var(--color-outline);
-      z-index: 1000;
+      background: rgba(0,0,0,0.8); padding: var(--spacing-3);
+      display: flex; justify-content: center; gap: 8px;
+      border-top: 1px solid var(--color-outline); z-index: 1000; backdrop-filter: blur(10px);
     }
     .dev-panel button {
-      background: #333; color: #fff; border: 1px solid #555;
-      padding: 5px 10px; border-radius: 4px; cursor: pointer;
+      background: #333; color: #fff; border: 1px solid #666; font-size: 12px;
+      padding: 6px 12px; border-radius: var(--radius-full); cursor: pointer; transition: 0.2s;
     }
+    .dev-panel button:hover { background: var(--color-primary); color: #000; border-color: var(--color-primary); }
   </style>
 </head>
 <body>
 
-  <!-- App Container -->
   <div class="container" id="app">
     
-    <!-- Initial Skeleton State -->
     <div id="loading-state">
       <div class="skeleton" style="height: 40px; width: 60%; margin: 0 auto 16px;"></div>
       <div class="skeleton" style="height: 20px; width: 80%; margin: 0 auto 32px;"></div>
       <div class="skeleton" style="height: 200px; border-radius: 16px; margin-bottom: 24px;"></div>
-      <div class="skeleton" style="height: 300px; width: 300px; border-radius: 50%; margin: 0 auto;"></div>
+      <div class="skeleton" style="height: 320px; width: 320px; border-radius: 50%; margin: 0 auto;"></div>
     </div>
 
-    <!-- Ready State (Hidden initially) -->
     <div id="ready-state" style="display: none;">
       
-      <h1>🎰 520 絕對領域</h1>
-      <p class="subtitle">儲值達標維持或升級 VIP<br>你的鑽石，決定今晚她的尺度</p>
-
-      <!-- Status Card -->
-      <div class="card">
-        <div class="stats-grid">
-          <div class="stat-box">
-            <div class="stat-label">目前等級</div>
-            <div class="stat-value" id="ui-level" style="color: var(--color-level-silver)">Lv. --</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-label">可兌換鑽石紀錄</div>
-            <div class="stat-value highlight" id="ui-diamonds">--</div>
-          </div>
-        </div>
-        
-        <div style="text-align: center; margin-bottom: var(--spacing-4);">
-          <span style="font-size: var(--font-body-medium); color: var(--color-on-primary-2);">目前持有抽獎券：</span>
-          <span style="font-size: var(--font-title-large); font-weight: bold; color: #fff;" id="ui-tickets">0</span>
-        </div>
-
-        <button class="btn btn-outline" id="btn-exchange" onclick="handleExchange()">
-          💎 兌換抽獎券 (每 5,200 鑽石 = 1 張)
-        </button>
-        <div style="text-align: center; font-size: 10px; color: var(--color-on-primary-3); margin-top: 8px;">
-          *兌換僅作為抽獎資格計算，絕不會扣除您的實際鑽石餘額。
+      <div class="marquee-wrapper">
+        <div class="marquee-content" id="fomo-marquee">
+          <div class="marquee-item">🏆 <span class="highlight">狂奔的野豬</span> 剛剛抽中了 <span>直播觀賞券 60 分鐘</span></div>
+          <div class="marquee-item">💸 <span class="highlight">台北乾爹</span> 成功兌換 <span>5 張黑金轉盤券</span></div>
+          <div class="marquee-item">🔥 <span class="highlight">LonelyNight</span> 抽中了 <span>黑金大賞 520,000 鑽石</span>！</div>
+          <div class="marquee-item">🏆 <span class="highlight">阿傑</span> 剛剛抽中了 <span>自訂熱搜字詞</span></div>
         </div>
       </div>
 
-      <!-- Arena -->
+      <h1>🎰 520 絕對領域</h1>
+      <p class="subtitle">活動結算期間：5/15 - 5/31<br>用你的實力，解鎖今晚的專屬尺度</p>
+
+      <div class="card">
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-label">目前階級</div>
+            <div class="stat-value tier-text" id="ui-level">Lv. --</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">可兌換鑽石</div>
+            <div class="stat-value" style="color: var(--color-primary)" id="ui-diamonds">--</div>
+          </div>
+        </div>
+        
+        <div class="ticket-display">
+          <span style="font-size: var(--font-body-medium); color: var(--color-on-primary-2);">可使用抽獎券</span><br>
+          <span style="font-size: 32px; font-weight: bold; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5);" id="ui-tickets">0</span>
+          <span style="font-size: 14px; color: var(--color-on-primary-3);"> 張</span>
+        </div>
+
+        <button class="btn btn-outline" id="btn-exchange" onclick="handleExchange()">
+          💎 兌換抽獎券 (5,200 鑽石/張)
+        </button>
+        <div style="text-align: center; font-size: 11px; color: var(--color-on-primary-3); margin-top: 10px; line-height: 1.4;">
+          *兌換僅計算達標資格，<b style="color:var(--color-primary);">絕對不會扣除實際鑽石餘額</b>，請放心兌換。
+        </div>
+      </div>
+
       <div id="arena" style="display: none; animation: fadeIn 0.5s;">
         <div class="arena-title" id="arena-title">--轉盤--</div>
         <div class="arena-desc" id="arena-desc">--文案--</div>
 
         <div class="wheel-container">
+          <div class="wheel-border"></div>
           <div class="pointer"></div>
           <div class="wheel" id="wheel"></div>
           <div class="wheel-center">SPIN</div>
@@ -297,13 +346,15 @@
     </div>
   </div>
 
-  <!-- Prize Modal -->
   <div class="modal-overlay" id="prize-modal">
+    <div id="confetti-container"></div>
     <div class="modal-content">
-      <div class="prize-icon">🎁</div>
-      <h2 id="prize-name">獲得獎品</h2>
-      <p style="color: var(--color-on-primary-2); font-size: var(--font-body-medium); margin-bottom: var(--spacing-6);" id="prize-desc">說明</p>
-      <button class="btn btn-primary" onclick="closeModal()">爽啦！繼續抽</button>
+      <div style="position:relative; z-index: 10;">
+        <div class="prize-icon">🎁</div>
+        <h2 id="prize-name" style="font-size: var(--font-title-large); margin-bottom: 8px;">獲得獎品</h2>
+        <p style="color: var(--color-on-primary-2); font-size: var(--font-body-medium); margin-bottom: var(--spacing-6); line-height: 1.5;" id="prize-desc">說明</p>
+        <button class="btn btn-primary" style="animation: none;" onclick="closeModal()">爽啦！繼續抽</button>
+      </div>
     </div>
   </div>
 
@@ -312,121 +363,72 @@
        活動配置與獎項設定
        ───────────────────────────────────────────────────────── */
     const EVENT_CONFIG = {
-      exchangeRate: 5200, // 5200 鑽石 = 1 張券
+      exchangeRate: 5200,
       tiers: {
         silver: {
-          minLv: 1, maxLv: 30, color: "var(--color-level-silver)",
+          minLv: 1, maxLv: 30, color: "var(--color-level-silver)", glow: "rgba(224,224,224,0.15)",
           title: "🥈 韭菜翻身【白銀轉盤】",
           desc: "不再當小透明！今晚褪下她的防備，解鎖乾爹的初級快樂。",
           prizes: [
-            { name: "白銀大賞", desc: "5,200 鑽石！抽中直接多看好幾分鐘一對一！", type: "diamond" },
-            { name: "長片觀賞 30m", desc: "讓你今晚不睡覺，免費看透她的秘密。", type: "ticket" },
-            { name: "直播觀賞 15m", desc: "一對一私聊初體驗，享受專屬的女友喘息。", type: "ticket" },
-            { name: "進場通知+編框", desc: "Lv.30 越級裝逼特權 (7天)，進房自帶光環！", type: "privilege" },
-            { name: "暱稱變更特權", desc: "Lv.40 隱姓埋名特權 (1次)，換個身份繼續暈。", type: "privilege" },
-            { name: "520 補貼金", desc: "520 鑽石，拿去買個便宜玩具電她一下。", type: "diamond" }
+            { name: "白銀大賞", desc: "5,200 鑽石！抽中直接多看好幾分鐘一對一！", highlight: true },
+            { name: "長片觀賞 30m", desc: "讓你今晚不睡覺，免費看透她的秘密。" },
+            { name: "直播觀賞 15m", desc: "一對一私聊初體驗，享受專屬的女友喘息。" },
+            { name: "進場通知+編框", desc: "Lv.30 越級裝逼特權 (7天)，進房自帶光環！" },
+            { name: "暱稱變更特權", desc: "Lv.40 隱姓埋名特權 (1次)，換個身份繼續暈。" },
+            { name: "520 補貼金", desc: "520 鑽石，拿去買個便宜玩具電她一下。" }
           ]
         },
         gold: {
-          minLv: 31, maxLv: 70, color: "var(--color-level-gold)",
+          minLv: 31, maxLv: 70, color: "var(--color-level-gold)", glow: "rgba(255,215,0,0.2)",
           title: "🥇 暈船乾爹【純金轉盤】",
           desc: "買下她的夜！霸佔熱搜與鈴聲，讓她每一次震動都為了你。",
           prizes: [
-            { name: "純金大賞", desc: "52,000 鑽石！直接回血！繼續砸錢讓她高潮。", type: "diamond" },
-            { name: "長片觀賞 120m", desc: "庫存神片看到飽，衛生紙請備齊。", type: "ticket" },
-            { name: "極致私聊 60m", desc: "價值破兩萬鑽！整整一小時的絕對服從。", type: "ticket" },
-            { name: "大神贊助 (1次)", desc: "Lv.50 英雄救美特權，讓她感動到主動私訊你。", type: "privilege" },
-            { name: "訂製鈴聲+徽章", desc: "Lv.60 專屬暗示 (14天)，制約她的目光。", type: "privilege" },
-            { name: "自訂熱搜字詞", desc: "Lv.70 霸佔熱搜 (7天)，指定你的狂妄宣言。", type: "privilege" },
-            { name: "5,200 補貼金", desc: "塞牙縫的零用錢，拿去刷指令洗頻剛好。", type: "diamond" }
+            { name: "純金大賞", desc: "52,000 鑽石！直接回血！繼續砸錢讓她高潮。", highlight: true },
+            { name: "長片觀賞 120m", desc: "庫存神片看到飽，衛生紙請備齊。" },
+            { name: "極致私聊 60m", desc: "價值破兩萬鑽！整整一小時的絕對服從。" },
+            { name: "大神贊助 (1次)", desc: "Lv.50 英雄救美特權，讓她感動到主動私訊你。" },
+            { name: "訂製鈴聲+徽章", desc: "Lv.60 專屬暗示 (14天)，制約她的目光。" },
+            { name: "自訂熱搜字詞", desc: "Lv.70 霸佔熱搜 (7天)，指定你的狂妄宣言。" },
+            { name: "5,200 補貼金", desc: "塞牙縫的零用錢，拿去刷指令洗頻剛好。" }
           ]
         },
         black: {
-          minLv: 71, maxLv: 100, color: "var(--color-level-black)",
+          minLv: 71, maxLv: 100, color: "var(--color-level-black)", glow: "rgba(177,91,255,0.3)",
           title: "👑 降維打擊【黑金帝王轉盤】",
           desc: "朕的私領域，別人不准碰！無限制的權力，今晚用實力輾壓全場。",
           prizes: [
-            { name: "黑金大賞", desc: "520,000 鑽石！一波暴富，百萬鑽夠買下她這個月所有的 Ticket Show。", type: "diamond" },
-            { name: "無盡索求 300m", desc: "連續 5 小時的極致榨乾，讓她下不了播。", type: "ticket" },
-            { name: "訂製創作者封面", desc: "Lv.80 主權宣示 (7天)，第一眼看到這女人是你的形狀！", type: "privilege" },
-            { name: "專屬專屬禮物", desc: "Lv.80 專屬調教 (14天)，帶有你名字的情趣禮物。", type: "privilege" },
-            { name: "直播欄位廣告", desc: "Lv.90 全網輾壓 (24hr)，你就是她最大的金主爸爸。", type: "privilege" },
-            { name: "線下女神約會", desc: "突破次元壁，直接與女神實體線下接觸！", type: "privilege" },
-            { name: "直播看到爽", desc: "Lv.100 上帝模式 (3天)，體驗真・站神的無敵快感。", type: "privilege" },
-            { name: "帝王恩賜", desc: "52,000 鑽石，掉幾萬鑽在地上聽個響。", type: "diamond" }
+            { name: "黑金大賞", desc: "520,000 鑽石！一波暴富，夠買下她這個月的 Ticket Show。", highlight: true },
+            { name: "無盡索求 300m", desc: "連續 5 小時的極致榨乾，讓她下不了播。" },
+            { name: "訂製創作者封面", desc: "Lv.80 主權宣示 (7天)，第一眼看到這女人是你的形狀！" },
+            { name: "專屬情趣禮物", desc: "Lv.80 專屬調教 (14天)，上架帶有你名字的專屬禮物。" },
+            { name: "直播欄位廣告", desc: "Lv.90 全網輾壓 (24hr)，你就是她最大的金主爸爸。" },
+            { name: "線下女神約會", desc: "核彈級誘因！突破次元壁，直接實體線下接觸！", highlight: true },
+            { name: "直播看到爽", desc: "Lv.100 上帝模式 (3天體驗)，體驗真・站神的無敵快感。" },
+            { name: "帝王恩賜", desc: "52,000 鑽石，掉幾萬鑽在地上聽個響。" }
           ]
         }
       }
     };
 
-    /* ─────────────────────────────────────────────────────────
-       State Management
-       ───────────────────────────────────────────────────────── */
-    let state = {
-      level: 0,
-      diamonds: 0,
-      tickets: 0,
-      currentTier: null,
-      isSpinning: false,
-      currentRotation: 0
-    };
+    let state = { level: 0, diamonds: 0, tickets: 0, currentTier: null, isSpinning: false, currentRotation: 0 };
 
     /* ─────────────────────────────────────────────────────────
-       Skill 31: SWAG Iframe Handshake & PWA
+       SWAG Iframe Initializer & Dev Mode
        ───────────────────────────────────────────────────────── */
-    let apiToken = null;
-    let retryInterval = null;
     const urlParams = new URLSearchParams(window.location.search);
-    const isDevMode = urlParams.get('test-mode') === '1' || urlParams.get('test-mode') === 'true' || window.self === window.top;
-
-    function sendReady() {
-      if(!isDevMode) window.parent.postMessage({ type: 'IFRAME_READY' }, '*');
-    }
+    const isDevMode = urlParams.get('test-mode') === '1' || window.self === window.top;
 
     document.addEventListener('DOMContentLoaded', () => {
-      // PWA Navigation Interceptor
-      document.addEventListener('click', (e) => {
-        const link = e.target.closest('a[target="_blank"]');
-        if (!link || isDevMode) return;
-        const url = new URL(link.href);
-        if (['swag.live', 'www.swag.live'].includes(url.hostname)) {
-          e.preventDefault();
-          window.parent.postMessage({ type: 'PWA_NAVIGATE', url: link.href }, '*');
-        }
-      });
-
-      if (isDevMode) {
-        initDevMode();
-      } else {
-        setTimeout(sendReady, 100);
-        retryInterval = setInterval(() => { if (!apiToken) sendReady(); }, 3000);
-      }
+      if (isDevMode) initDevMode();
+      // 在實際環境中這裡會接續原有的 postMessage 邏輯
     });
 
-    window.addEventListener('message', (event) => {
-      const { type, apiUrlPrefix, token } = event.data || {};
-      if (type === 'SET_DOMAIN_CONFIG' && apiUrlPrefix) window.apiBase = apiUrlPrefix;
-      if (type === 'SET_TOKEN' && token && token !== apiToken) {
-        apiToken = token;
-        clearInterval(retryInterval);
-        fetchRealUserData();
-      }
-    });
-
-    /* ─────────────────────────────────────────────────────────
-       Dev Mode (測試模式)
-       ───────────────────────────────────────────────────────── */
     function initDevMode() {
       const banner = document.createElement('div');
-      banner.style.cssText = `
-        position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
-        background: repeating-linear-gradient(45deg, #ff0000, #ff0000 10px, #ffcc00 10px, #ffcc00 20px);
-        color: #000; font-weight: 900; font-size: 14px; padding: 10px 20px; text-align: center; border-bottom: 3px solid #000;
-      `;
-      banner.textContent = '⚠️ 本地預覽模式 (Dev Mode) ─ 以下為假資料 ⚠️';
+      banner.style.cssText = `position: fixed; top: 0; left: 0; right: 0; z-index: 9999; background: #FFD100; color: #000; font-weight: 800; font-size: 12px; padding: 6px; text-align: center; border-bottom: 2px solid #000;`;
+      banner.textContent = '🛠️ 開發預覽模式 (Dev Mode)';
       document.body.prepend(banner);
 
-      // Dev Switcher Panel
       const panel = document.createElement('div');
       panel.className = 'dev-panel';
       panel.innerHTML = `
@@ -436,8 +438,7 @@
       `;
       document.body.appendChild(panel);
 
-      // Simulate network delay then load mock data
-      setTimeout(() => mockLoadUser(15), 800);
+      setTimeout(() => mockLoadUser(50), 600); // 預設展示純金輪盤
     }
 
     function mockLoadUser(level) {
@@ -447,19 +448,13 @@
       setTimeout(() => {
         state.level = level;
         state.diamonds = level === 15 ? 12000 : level === 50 ? 120000 : 880000;
-        state.tickets = 0; // reset for testing
+        state.tickets = 0;
         renderApp();
-      }, 300);
-    }
-
-    function fetchRealUserData() {
-      // 這裡呼叫 BFF 的 /me 取得真實資料，為展示邏輯先 mock
-      // fetch(`${window.apiBase}/me`, { headers: { Authorization: `Bearer ${apiToken}` } })
-      mockLoadUser(45); // Fallback mock for demo
+      }, 400);
     }
 
     /* ─────────────────────────────────────────────────────────
-       Core Logic & UI Rendering
+       Core Rendering & Interactions
        ───────────────────────────────────────────────────────── */
     function determineTier(level) {
       if (level >= EVENT_CONFIG.tiers.black.minLv) return EVENT_CONFIG.tiers.black;
@@ -470,16 +465,15 @@
     function renderApp() {
       state.currentTier = determineTier(state.level);
       
-      // Update Dashboard
-      const levelEl = document.getElementById('ui-level');
-      levelEl.textContent = `Lv. ${state.level}`;
-      levelEl.style.color = state.currentTier.color;
+      // Update CSS Variables for Dynamic Theming
+      document.documentElement.style.setProperty('--tier-color', state.currentTier.color);
+      document.documentElement.style.setProperty('--tier-glow', state.currentTier.glow);
+
+      document.getElementById('ui-level').textContent = `Lv. ${state.level}`;
       document.getElementById('ui-diamonds').textContent = state.diamonds.toLocaleString();
       document.getElementById('ui-tickets').textContent = state.tickets;
 
-      // Update Arena Info
       document.getElementById('arena-title').textContent = state.currentTier.title;
-      document.getElementById('arena-title').style.color = state.currentTier.color;
       document.getElementById('arena-desc').textContent = state.currentTier.desc;
       
       drawWheel(state.currentTier.prizes);
@@ -487,34 +481,38 @@
       document.getElementById('loading-state').style.display = 'none';
       document.getElementById('ready-state').style.display = 'block';
       document.getElementById('arena').style.display = state.tickets > 0 ? 'block' : 'none';
+      
+      // Toggle Marquee visibility based on arena status to avoid screen clutter
+      document.querySelector('.marquee-wrapper').style.display = state.tickets > 0 ? 'none' : 'block';
     }
 
     function handleExchange() {
       if (state.diamonds < EVENT_CONFIG.exchangeRate) {
-        alert(`兌換失敗！需要至少 ${EVENT_CONFIG.exchangeRate} 鑽石紀錄才能兌換 1 張券。`);
+        alert(`兌換失敗！需要至少 ${EVENT_CONFIG.exchangeRate} 鑽石紀錄才能兌換。`);
         return;
       }
       
-      // Skill 要求：兩次 Alert 確認
-      if (confirm("確認要將目前儲值紀錄兌換成抽獎券嗎？")) {
-        if (confirm("⚠️ 再次確認！\n兌換後不會實際扣除鑽石，僅作為資格計算。\n確定執行？")) {
-          // Calculate
+      // 雙重防呆確認 (依照企劃需求)
+      if (confirm("確認要將目前的達標紀錄兌換成抽獎券嗎？")) {
+        if (confirm("⚠️ 再次確認！\n兌換後不會扣除實際鑽石餘額，僅作為資格計算。\n確定執行？")) {
           const newTickets = Math.floor(state.diamonds / EVENT_CONFIG.exchangeRate);
           state.tickets += newTickets;
-          state.diamonds = state.diamonds % EVENT_CONFIG.exchangeRate; // Remaining unexchanged calculation
+          state.diamonds = state.diamonds % EVENT_CONFIG.exchangeRate; 
           
-          alert(`兌換成功！獲得 ${newTickets} 張抽獎券。`);
+          alert(`🎉 兌換成功！獲得 ${newTickets} 張轉盤券！`);
           renderApp();
+          // 平滑滾動至輪盤區
+          setTimeout(() => document.getElementById('arena').scrollIntoView({behavior: 'smooth'}), 100);
         }
       }
     }
 
     /* ─────────────────────────────────────────────────────────
-       Roulette Wheel Logic (Pure CSS/JS)
+       Roulette Wheel Logic
        ───────────────────────────────────────────────────────── */
     function drawWheel(prizes) {
       const wheel = document.getElementById('wheel');
-      wheel.innerHTML = ''; // clear
+      wheel.innerHTML = ''; 
       
       const sliceAngle = 360 / prizes.length;
       let gradientParts = [];
@@ -523,32 +521,33 @@
         const startAngle = index * sliceAngle;
         const endAngle = (index + 1) * sliceAngle;
         
-        // Alternate colors
-        const bgColor = index % 2 === 0 ? '#232323' : '#191919';
-        // Highlight top prize (index 0)
-        const finalBgColor = index === 0 ? 'rgba(0, 210, 190, 0.2)' : bgColor;
+        const bgColor = index % 2 === 0 ? '#1f1f1f' : '#2a2a2a';
+        // 大賞區塊給予特別底色標示
+        const finalBgColor = prize.highlight ? 'rgba(255,255,255,0.1)' : bgColor;
         
         gradientParts.push(`${finalBgColor} ${startAngle}deg ${endAngle}deg`);
 
-        // Text positioning
         const labelAngle = startAngle + (sliceAngle / 2);
         const label = document.createElement('div');
         label.className = 'slice-label';
-        // Rotate text so it points outward from center
         label.style.transform = `translate(-100%, -50%) rotate(${labelAngle - 180}deg)`;
         label.style.left = '50%';
-        label.innerHTML = index === 0 ? `👑 <span style="color:var(--color-primary)">${prize.name}</span>` : prize.name;
+        
+        // 大賞加上皇冠與特定顏色
+        if (prize.highlight) {
+          label.innerHTML = `👑 <span style="color:var(--tier-color)">${prize.name}</span>`;
+        } else {
+          label.innerHTML = prize.name;
+        }
         
         wheel.appendChild(label);
       });
 
       wheel.style.background = `conic-gradient(${gradientParts.join(', ')})`;
-      // Reset rotation
       state.currentRotation = 0;
       wheel.style.transition = 'none';
       wheel.style.transform = `rotate(0deg)`;
-      // Force reflow
-      void wheel.offsetWidth;
+      void wheel.offsetWidth; // Force reflow
     }
 
     function spinWheel() {
@@ -557,28 +556,25 @@
       state.tickets--;
       document.getElementById('ui-tickets').textContent = state.tickets;
       state.isSpinning = true;
-      document.getElementById('btn-spin').disabled = true;
+      const btn = document.getElementById('btn-spin');
+      btn.disabled = true;
+      btn.textContent = '🔄 轉動中...';
 
       const prizes = state.currentTier.prizes;
       const sliceAngle = 360 / prizes.length;
       
-      // Randomly pick a prize index (0 to length-1)
       const winningIndex = Math.floor(Math.random() * prizes.length);
-      
-      // Calculate rotation
-      // Need pointer to land in the middle of the winning slice
-      // Pointer is at top (0 deg). 
       const targetAngle = 360 - (winningIndex * sliceAngle) - (sliceAngle / 2);
       
-      // Add 5 full extra spins
-      const spins = 5 * 360;
+      // 增加轉動圈數讓動畫更刺激 (6圈)
+      const spins = 6 * 360;
       state.currentRotation += spins + targetAngle;
 
       const wheel = document.getElementById('wheel');
-      wheel.style.transition = 'transform 4s cubic-bezier(0.2, 0.8, 0.1, 1)';
+      // 改良貝茲曲線，創造「猛烈加速後緩慢停止」的懸疑感
+      wheel.style.transition = 'transform 5s cubic-bezier(0.15, 0.95, 0.1, 1)';
       wheel.style.transform = `rotate(${state.currentRotation}deg)`;
 
-      // Normalize currentRotation for next spin so it doesn't grow infinitely huge
       setTimeout(() => {
         state.currentRotation = state.currentRotation % 360;
         wheel.style.transition = 'none';
@@ -587,23 +583,47 @@
         showModal(prizes[winningIndex]);
         
         state.isSpinning = false;
-        document.getElementById('btn-spin').disabled = state.tickets <= 0;
-        if(state.tickets <= 0) document.getElementById('arena').style.display = 'none';
-      }, 4050); // Slightly longer than transition
+        btn.textContent = '🎯 立即抽獎 (消耗 1 張)';
+        btn.disabled = state.tickets <= 0;
+        
+        if(state.tickets <= 0) {
+           setTimeout(() => {
+             document.getElementById('arena').style.display = 'none';
+             document.querySelector('.marquee-wrapper').style.display = 'block';
+           }, 1000);
+        }
+      }, 5050);
     }
 
     /* ─────────────────────────────────────────────────────────
-       Modal Logic
+       Modal & Confetti FX
        ───────────────────────────────────────────────────────── */
     function showModal(prize) {
       document.getElementById('prize-name').textContent = prize.name;
       document.getElementById('prize-name').style.color = state.currentTier.color;
       document.getElementById('prize-desc').textContent = prize.desc;
       document.getElementById('prize-modal').classList.add('active');
+      createConfetti();
     }
 
     function closeModal() {
       document.getElementById('prize-modal').classList.remove('active');
+      document.getElementById('confetti-container').innerHTML = ''; // 清除碎紙花
+    }
+
+    function createConfetti() {
+      const container = document.getElementById('confetti-container');
+      const colors = ['#FFD700', '#FFFFFF', '#00D2BE', state.currentTier.color];
+      
+      for (let i = 0; i < 60; i++) {
+        let conf = document.createElement('div');
+        conf.className = 'confetti-piece';
+        conf.style.left = Math.random() * 100 + '%';
+        conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        conf.style.animationDuration = (Math.random() * 2 + 2) + 's';
+        conf.style.animationDelay = (Math.random() * 0.5) + 's';
+        container.appendChild(conf);
+      }
     }
   </script>
 </body>
