@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>520 絕對領域：階級結算大輪盤</title>
+  <style>
+    /* ─────────────────────────────────────────────────────────
+       Skill 32: Design Tokens (嚴格遵守)
+       ───────────────────────────────────────────────────────── */
+    :root {
+      --color-primary: #00D2BE;
+      --color-primary-hover: rgba(0,210,190,0.8);
+      --color-primary-pressed: rgba(0,210,190,0.4);
+      --color-primary-disabled: rgba(71,71,71,0.2);
+      --color-surface: #191919;
+      --color-surface-container: #232323;
+      --color-surface-variant: rgba(71,71,71,0.4);
+      --color-on-primary-1: #FFFFFF;
+      --color-on-primary-2: #C8C8C8;
+      --color-on-primary-3: #646464;
+      --color-on-primary-disabled: rgba(255,255,255,0.4);
+      --color-outline: #474747;
+      --color-outline-variant: rgba(71,71,71,0.4);
+      --color-outline-brand: #00D2BE;
+      --color-scrim: rgba(25,25,25,0.8);
+      --color-shadow: rgba(25,25,25,0.2);
+      
+      /* Level Presets */
+      --color-level-silver: #C8C8C8;
+      --color-level-gold: #FFD100;
+      --color-level-black: #8238BA;
+
+      --font-family: 'PingFang TC', -apple-system, sans-serif;
+      --font-weight-regular: 400;
+      --font-weight-semibold: 600;
+      --font-headline-large: 36px;
+      --font-headline-medium: 32px;
+      --font-headline-small: 28px;
+      --font-title-large: 22px;
+      --font-title-medium: 20px;
+      --font-title-small: 18px;
+      --font-body-large: 16px;
+      --font-body-medium: 14px;
+      --font-body-small: 12px;
+
+      --spacing-2: 4px; --spacing-3: 8px; --spacing-4: 12px;
+      --spacing-5: 16px; --spacing-6: 24px; --spacing-7: 32px;
+
+      --radius-s: 8px; --radius-m: 12px; --radius-l: 16px; --radius-full: 1000px;
+      --radius-modal: 4px;
+    }
+
+    @media (max-width: 767px) {
+      :root { --radius-modal: 0px; }
+    }
+
+    /* ─────────────────────────────────────────────────────────
+       Base Styles & Glassmorphism
+       ───────────────────────────────────────────────────────── */
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: var(--font-family);
+      color: var(--color-on-primary-1);
+      background-color: var(--color-surface);
+      margin: 0; padding: 0;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 480px; /* Mobile first for iframe */
+      margin: 0 auto;
+      padding: var(--spacing-5);
+      padding-bottom: 80px;
+    }
+
+    /* Typography */
+    h1 { font-size: var(--font-headline-small); margin: 0 0 var(--spacing-3); font-weight: var(--font-weight-semibold); text-align: center;}
+    h2 { font-size: var(--font-title-large); margin: 0 0 var(--spacing-2); color: var(--color-primary); }
+    .subtitle { font-size: var(--font-body-medium); color: var(--color-on-primary-2); text-align: center; margin-bottom: var(--spacing-6); line-height: 1.5; }
+
+    /* Skeleton Loading */
+    .skeleton {
+      background: linear-gradient(90deg, var(--color-surface-container) 25%, var(--color-surface-variant) 50%, var(--color-surface-container) 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      border-radius: var(--radius-s);
+    }
+    @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* Cards */
+    .card {
+      background: rgba(35, 35, 35, 0.6);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--color-outline-variant);
+      border-radius: var(--radius-l);
+      padding: var(--spacing-5);
+      margin-bottom: var(--spacing-6);
+    }
+
+    /* Dashboard Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-4);
+      margin-bottom: var(--spacing-5);
+    }
+    .stat-box {
+      background: var(--color-surface-container);
+      border-radius: var(--radius-m);
+      padding: var(--spacing-4);
+      text-align: center;
+    }
+    .stat-label { font-size: var(--font-body-small); color: var(--color-on-primary-2); margin-bottom: var(--spacing-2); }
+    .stat-value { font-size: var(--font-title-large); font-weight: var(--font-weight-semibold); }
+    .highlight { color: var(--color-primary); }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      padding: var(--spacing-4);
+      border: none;
+      border-radius: var(--radius-full);
+      font-size: var(--font-body-large);
+      font-weight: var(--font-weight-semibold);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--color-primary); color: var(--color-surface); }
+    .btn-primary:disabled { background: var(--color-primary-disabled); color: var(--color-on-primary-disabled); cursor: not-allowed; }
+    .btn-outline { background: transparent; border: 1px solid var(--color-primary); color: var(--color-primary); }
+    
+    /* Roulette Arena */
+    .arena-title { text-align: center; font-size: var(--font-title-large); font-weight: var(--font-weight-semibold); margin-bottom: var(--spacing-2); }
+    .arena-desc { text-align: center; font-size: var(--font-body-medium); color: var(--color-on-primary-2); margin-bottom: var(--spacing-6); line-height: 1.4;}
+
+    /* Pure CSS Roulette Wheel */
+    .wheel-container {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin: 0 auto var(--spacing-6);
+    }
+    .wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 4px solid var(--color-surface-container);
+      position: relative;
+      overflow: hidden;
+      transition: transform 5s cubic-bezier(0.2, 0.8, 0.1, 1); /* Smooth spinning easing */
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+    .pointer {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30px;
+      height: 40px;
+      background: var(--color-primary);
+      clip-path: polygon(50% 100%, 0 0, 100% 0);
+      z-index: 10;
+      filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.5));
+    }
+    .wheel-center {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60px; height: 60px;
+      background: var(--color-surface);
+      border: 3px solid var(--color-outline);
+      border-radius: 50%;
+      z-index: 5;
+      display: flex; justify-content: center; align-items: center;
+      font-weight: bold; color: var(--color-on-primary-1);
+    }
+    /* Slices are dynamically generated via JS CSS Text */
+    .slice-label {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 130px; /* Radius minus center */
+      transform-origin: 0 50%;
+      text-align: right;
+      padding-right: 20px;
+      font-size: 11px;
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-on-primary-1);
+      z-index: 2;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--color-scrim);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 999;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .modal-content {
+      background: var(--color-surface);
+      border-radius: var(--radius-modal);
+      width: var(--modal-width);
+      max-height: var(--modal-max-height);
+      padding: var(--spacing-6);
+      text-align: center;
+      border: 1px solid var(--color-outline);
+      transform: translateY(20px);
+      transition: transform 0.3s;
+    }
+    .modal-overlay.active .modal-content { transform: translateY(0); }
+    .prize-icon { font-size: 64px; margin-bottom: var(--spacing-4); }
+
+    /* Dev Testing Panel */
+    .dev-panel {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--color-surface-container);
+      padding: var(--spacing-3);
+      display: flex; justify-content: center; gap: 10px;
+      border-top: 1px solid var(--color-outline);
+      z-index: 1000;
+    }
+    .dev-panel button {
+      background: #333; color: #fff; border: 1px solid #555;
+      padding: 5px 10px; border-radius: 4px; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- App Container -->
+  <div class="container" id="app">
+    
+    <!-- Initial Skeleton State -->
+    <div id="loading-state">
+      <div class="skeleton" style="height: 40px; width: 60%; margin: 0 auto 16px;"></div>
+      <div class="skeleton" style="height: 20px; width: 80%; margin: 0 auto 32px;"></div>
+      <div class="skeleton" style="height: 200px; border-radius: 16px; margin-bottom: 24px;"></div>
+      <div class="skeleton" style="height: 300px; width: 300px; border-radius: 50%; margin: 0 auto;"></div>
+    </div>
+
+    <!-- Ready State (Hidden initially) -->
+    <div id="ready-state" style="display: none;">
+      
+      <h1>🎰 520 絕對領域</h1>
+      <p class="subtitle">儲值達標維持或升級 VIP<br>你的鑽石，決定今晚她的尺度</p>
+
+      <!-- Status Card -->
+      <div class="card">
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-label">目前等級</div>
+            <div class="stat-value" id="ui-level" style="color: var(--color-level-silver)">Lv. --</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">可兌換鑽石紀錄</div>
+            <div class="stat-value highlight" id="ui-diamonds">--</div>
+          </div>
+        </div>
+        
+        <div style="text-align: center; margin-bottom: var(--spacing-4);">
+          <span style="font-size: var(--font-body-medium); color: var(--color-on-primary-2);">目前持有抽獎券：</span>
+          <span style="font-size: var(--font-title-large); font-weight: bold; color: #fff;" id="ui-tickets">0</span>
+        </div>
+
+        <button class="btn btn-outline" id="btn-exchange" onclick="handleExchange()">
+          💎 兌換抽獎券 (每 5,200 鑽石 = 1 張)
+        </button>
+        <div style="text-align: center; font-size: 10px; color: var(--color-on-primary-3); margin-top: 8px;">
+          *兌換僅作為抽獎資格計算，絕不會扣除您的實際鑽石餘額。
+        </div>
+      </div>
+
+      <!-- Arena -->
+      <div id="arena" style="display: none; animation: fadeIn 0.5s;">
+        <div class="arena-title" id="arena-title">--轉盤--</div>
+        <div class="arena-desc" id="arena-desc">--文案--</div>
+
+        <div class="wheel-container">
+          <div class="pointer"></div>
+          <div class="wheel" id="wheel"></div>
+          <div class="wheel-center">SPIN</div>
+        </div>
+
+        <button class="btn btn-primary" id="btn-spin" onclick="spinWheel()">
+          🎯 立即抽獎 (消耗 1 張)
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Prize Modal -->
+  <div class="modal-overlay" id="prize-modal">
+    <div class="modal-content">
+      <div class="prize-icon">🎁</div>
+      <h2 id="prize-name">獲得獎品</h2>
+      <p style="color: var(--color-on-primary-2); font-size: var(--font-body-medium); margin-bottom: var(--spacing-6);" id="prize-desc">說明</p>
+      <button class="btn btn-primary" onclick="closeModal()">爽啦！繼續抽</button>
+    </div>
+  </div>
+
+  <script>
+    /* ─────────────────────────────────────────────────────────
+       活動配置與獎項設定
+       ───────────────────────────────────────────────────────── */
+    const EVENT_CONFIG = {
+      exchangeRate: 5200, // 5200 鑽石 = 1 張券
+      tiers: {
+        silver: {
+          minLv: 1, maxLv: 30, color: "var(--color-level-silver)",
+          title: "🥈 韭菜翻身【白銀轉盤】",
+          desc: "不再當小透明！今晚褪下她的防備，解鎖乾爹的初級快樂。",
+          prizes: [
+            { name: "白銀大賞", desc: "5,200 鑽石！抽中直接多看好幾分鐘一對一！", type: "diamond" },
+            { name: "長片觀賞 30m", desc: "讓你今晚不睡覺，免費看透她的秘密。", type: "ticket" },
+            { name: "直播觀賞 15m", desc: "一對一私聊初體驗，享受專屬的女友喘息。", type: "ticket" },
+            { name: "進場通知+編框", desc: "Lv.30 越級裝逼特權 (7天)，進房自帶光環！", type: "privilege" },
+            { name: "暱稱變更特權", desc: "Lv.40 隱姓埋名特權 (1次)，換個身份繼續暈。", type: "privilege" },
+            { name: "520 補貼金", desc: "520 鑽石，拿去買個便宜玩具電她一下。", type: "diamond" }
+          ]
+        },
+        gold: {
+          minLv: 31, maxLv: 70, color: "var(--color-level-gold)",
+          title: "🥇 暈船乾爹【純金轉盤】",
+          desc: "買下她的夜！霸佔熱搜與鈴聲，讓她每一次震動都為了你。",
+          prizes: [
+            { name: "純金大賞", desc: "52,000 鑽石！直接回血！繼續砸錢讓她高潮。", type: "diamond" },
+            { name: "長片觀賞 120m", desc: "庫存神片看到飽，衛生紙請備齊。", type: "ticket" },
+            { name: "極致私聊 60m", desc: "價值破兩萬鑽！整整一小時的絕對服從。", type: "ticket" },
+            { name: "大神贊助 (1次)", desc: "Lv.50 英雄救美特權，讓她感動到主動私訊你。", type: "privilege" },
+            { name: "訂製鈴聲+徽章", desc: "Lv.60 專屬暗示 (14天)，制約她的目光。", type: "privilege" },
+            { name: "自訂熱搜字詞", desc: "Lv.70 霸佔熱搜 (7天)，指定你的狂妄宣言。", type: "privilege" },
+            { name: "5,200 補貼金", desc: "塞牙縫的零用錢，拿去刷指令洗頻剛好。", type: "diamond" }
+          ]
+        },
+        black: {
+          minLv: 71, maxLv: 100, color: "var(--color-level-black)",
+          title: "👑 降維打擊【黑金帝王轉盤】",
+          desc: "朕的私領域，別人不准碰！無限制的權力，今晚用實力輾壓全場。",
+          prizes: [
+            { name: "黑金大賞", desc: "520,000 鑽石！一波暴富，百萬鑽夠買下她這個月所有的 Ticket Show。", type: "diamond" },
+            { name: "無盡索求 300m", desc: "連續 5 小時的極致榨乾，讓她下不了播。", type: "ticket" },
+            { name: "訂製創作者封面", desc: "Lv.80 主權宣示 (7天)，第一眼看到這女人是你的形狀！", type: "privilege" },
+            { name: "專屬專屬禮物", desc: "Lv.80 專屬調教 (14天)，帶有你名字的情趣禮物。", type: "privilege" },
+            { name: "直播欄位廣告", desc: "Lv.90 全網輾壓 (24hr)，你就是她最大的金主爸爸。", type: "privilege" },
+            { name: "線下女神約會", desc: "突破次元壁，直接與女神實體線下接觸！", type: "privilege" },
+            { name: "直播看到爽", desc: "Lv.100 上帝模式 (3天)，體驗真・站神的無敵快感。", type: "privilege" },
+            { name: "帝王恩賜", desc: "52,000 鑽石，掉幾萬鑽在地上聽個響。", type: "diamond" }
+          ]
+        }
+      }
+    };
+
+    /* ─────────────────────────────────────────────────────────
+       State Management
+       ───────────────────────────────────────────────────────── */
+    let state = {
+      level: 0,
+      diamonds: 0,
+      tickets: 0,
+      currentTier: null,
+      isSpinning: false,
+      currentRotation: 0
+    };
+
+    /* ─────────────────────────────────────────────────────────
+       Skill 31: SWAG Iframe Handshake & PWA
+       ───────────────────────────────────────────────────────── */
+    let apiToken = null;
+    let retryInterval = null;
+    const urlParams = new URLSearchParams(window.location.search);
+    const isDevMode = urlParams.get('test-mode') === '1' || urlParams.get('test-mode') === 'true' || window.self === window.top;
+
+    function sendReady() {
+      if(!isDevMode) window.parent.postMessage({ type: 'IFRAME_READY' }, '*');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // PWA Navigation Interceptor
+      document.addEventListener('click', (e) => {
+        const link = e.target.closest('a[target="_blank"]');
+        if (!link || isDevMode) return;
+        const url = new URL(link.href);
+        if (['swag.live', 'www.swag.live'].includes(url.hostname)) {
+          e.preventDefault();
+          window.parent.postMessage({ type: 'PWA_NAVIGATE', url: link.href }, '*');
+        }
+      });
+
+      if (isDevMode) {
+        initDevMode();
+      } else {
+        setTimeout(sendReady, 100);
+        retryInterval = setInterval(() => { if (!apiToken) sendReady(); }, 3000);
+      }
+    });
+
+    window.addEventListener('message', (event) => {
+      const { type, apiUrlPrefix, token } = event.data || {};
+      if (type === 'SET_DOMAIN_CONFIG' && apiUrlPrefix) window.apiBase = apiUrlPrefix;
+      if (type === 'SET_TOKEN' && token && token !== apiToken) {
+        apiToken = token;
+        clearInterval(retryInterval);
+        fetchRealUserData();
+      }
+    });
+
+    /* ─────────────────────────────────────────────────────────
+       Dev Mode (測試模式)
+       ───────────────────────────────────────────────────────── */
+    function initDevMode() {
+      const banner = document.createElement('div');
+      banner.style.cssText = `
+        position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+        background: repeating-linear-gradient(45deg, #ff0000, #ff0000 10px, #ffcc00 10px, #ffcc00 20px);
+        color: #000; font-weight: 900; font-size: 14px; padding: 10px 20px; text-align: center; border-bottom: 3px solid #000;
+      `;
+      banner.textContent = '⚠️ 本地預覽模式 (Dev Mode) ─ 以下為假資料 ⚠️';
+      document.body.prepend(banner);
+
+      // Dev Switcher Panel
+      const panel = document.createElement('div');
+      panel.className = 'dev-panel';
+      panel.innerHTML = `
+        <button onclick="mockLoadUser(15)">Lv.15 白銀</button>
+        <button onclick="mockLoadUser(50)">Lv.50 純金</button>
+        <button onclick="mockLoadUser(85)">Lv.85 黑金</button>
+      `;
+      document.body.appendChild(panel);
+
+      // Simulate network delay then load mock data
+      setTimeout(() => mockLoadUser(15), 800);
+    }
+
+    function mockLoadUser(level) {
+      document.getElementById('loading-state').style.display = 'block';
+      document.getElementById('ready-state').style.display = 'none';
+      
+      setTimeout(() => {
+        state.level = level;
+        state.diamonds = level === 15 ? 12000 : level === 50 ? 120000 : 880000;
+        state.tickets = 0; // reset for testing
+        renderApp();
+      }, 300);
+    }
+
+    function fetchRealUserData() {
+      // 這裡呼叫 BFF 的 /me 取得真實資料，為展示邏輯先 mock
+      // fetch(`${window.apiBase}/me`, { headers: { Authorization: `Bearer ${apiToken}` } })
+      mockLoadUser(45); // Fallback mock for demo
+    }
+
+    /* ─────────────────────────────────────────────────────────
+       Core Logic & UI Rendering
+       ───────────────────────────────────────────────────────── */
+    function determineTier(level) {
+      if (level >= EVENT_CONFIG.tiers.black.minLv) return EVENT_CONFIG.tiers.black;
+      if (level >= EVENT_CONFIG.tiers.gold.minLv) return EVENT_CONFIG.tiers.gold;
+      return EVENT_CONFIG.tiers.silver;
+    }
+
+    function renderApp() {
+      state.currentTier = determineTier(state.level);
+      
+      // Update Dashboard
+      const levelEl = document.getElementById('ui-level');
+      levelEl.textContent = `Lv. ${state.level}`;
+      levelEl.style.color = state.currentTier.color;
+      document.getElementById('ui-diamonds').textContent = state.diamonds.toLocaleString();
+      document.getElementById('ui-tickets').textContent = state.tickets;
+
+      // Update Arena Info
+      document.getElementById('arena-title').textContent = state.currentTier.title;
+      document.getElementById('arena-title').style.color = state.currentTier.color;
+      document.getElementById('arena-desc').textContent = state.currentTier.desc;
+      
+      drawWheel(state.currentTier.prizes);
+
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('ready-state').style.display = 'block';
+      document.getElementById('arena').style.display = state.tickets > 0 ? 'block' : 'none';
+    }
+
+    function handleExchange() {
+      if (state.diamonds < EVENT_CONFIG.exchangeRate) {
+        alert(`兌換失敗！需要至少 ${EVENT_CONFIG.exchangeRate} 鑽石紀錄才能兌換 1 張券。`);
+        return;
+      }
+      
+      // Skill 要求：兩次 Alert 確認
+      if (confirm("確認要將目前儲值紀錄兌換成抽獎券嗎？")) {
+        if (confirm("⚠️ 再次確認！\n兌換後不會實際扣除鑽石，僅作為資格計算。\n確定執行？")) {
+          // Calculate
+          const newTickets = Math.floor(state.diamonds / EVENT_CONFIG.exchangeRate);
+          state.tickets += newTickets;
+          state.diamonds = state.diamonds % EVENT_CONFIG.exchangeRate; // Remaining unexchanged calculation
+          
+          alert(`兌換成功！獲得 ${newTickets} 張抽獎券。`);
+          renderApp();
+        }
+      }
+    }
+
+    /* ─────────────────────────────────────────────────────────
+       Roulette Wheel Logic (Pure CSS/JS)
+       ───────────────────────────────────────────────────────── */
+    function drawWheel(prizes) {
+      const wheel = document.getElementById('wheel');
+      wheel.innerHTML = ''; // clear
+      
+      const sliceAngle = 360 / prizes.length;
+      let gradientParts = [];
+
+      prizes.forEach((prize, index) => {
+        const startAngle = index * sliceAngle;
+        const endAngle = (index + 1) * sliceAngle;
+        
+        // Alternate colors
+        const bgColor = index % 2 === 0 ? '#232323' : '#191919';
+        // Highlight top prize (index 0)
+        const finalBgColor = index === 0 ? 'rgba(0, 210, 190, 0.2)' : bgColor;
+        
+        gradientParts.push(`${finalBgColor} ${startAngle}deg ${endAngle}deg`);
+
+        // Text positioning
+        const labelAngle = startAngle + (sliceAngle / 2);
+        const label = document.createElement('div');
+        label.className = 'slice-label';
+        // Rotate text so it points outward from center
+        label.style.transform = `translate(-100%, -50%) rotate(${labelAngle - 180}deg)`;
+        label.style.left = '50%';
+        label.innerHTML = index === 0 ? `👑 <span style="color:var(--color-primary)">${prize.name}</span>` : prize.name;
+        
+        wheel.appendChild(label);
+      });
+
+      wheel.style.background = `conic-gradient(${gradientParts.join(', ')})`;
+      // Reset rotation
+      state.currentRotation = 0;
+      wheel.style.transition = 'none';
+      wheel.style.transform = `rotate(0deg)`;
+      // Force reflow
+      void wheel.offsetWidth;
+    }
+
+    function spinWheel() {
+      if (state.isSpinning || state.tickets <= 0) return;
+      
+      state.tickets--;
+      document.getElementById('ui-tickets').textContent = state.tickets;
+      state.isSpinning = true;
+      document.getElementById('btn-spin').disabled = true;
+
+      const prizes = state.currentTier.prizes;
+      const sliceAngle = 360 / prizes.length;
+      
+      // Randomly pick a prize index (0 to length-1)
+      const winningIndex = Math.floor(Math.random() * prizes.length);
+      
+      // Calculate rotation
+      // Need pointer to land in the middle of the winning slice
+      // Pointer is at top (0 deg). 
+      const targetAngle = 360 - (winningIndex * sliceAngle) - (sliceAngle / 2);
+      
+      // Add 5 full extra spins
+      const spins = 5 * 360;
+      state.currentRotation += spins + targetAngle;
+
+      const wheel = document.getElementById('wheel');
+      wheel.style.transition = 'transform 4s cubic-bezier(0.2, 0.8, 0.1, 1)';
+      wheel.style.transform = `rotate(${state.currentRotation}deg)`;
+
+      // Normalize currentRotation for next spin so it doesn't grow infinitely huge
+      setTimeout(() => {
+        state.currentRotation = state.currentRotation % 360;
+        wheel.style.transition = 'none';
+        wheel.style.transform = `rotate(${state.currentRotation}deg)`;
+        
+        showModal(prizes[winningIndex]);
+        
+        state.isSpinning = false;
+        document.getElementById('btn-spin').disabled = state.tickets <= 0;
+        if(state.tickets <= 0) document.getElementById('arena').style.display = 'none';
+      }, 4050); // Slightly longer than transition
+    }
+
+    /* ─────────────────────────────────────────────────────────
+       Modal Logic
+       ───────────────────────────────────────────────────────── */
+    function showModal(prize) {
+      document.getElementById('prize-name').textContent = prize.name;
+      document.getElementById('prize-name').style.color = state.currentTier.color;
+      document.getElementById('prize-desc').textContent = prize.desc;
+      document.getElementById('prize-modal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('prize-modal').classList.remove('active');
+    }
+  </script>
+</body>
+</html>
