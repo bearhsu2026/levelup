@@ -6,13 +6,10 @@
   <title>520 絕對領域：階級結算大輪盤</title>
   <style>
     /* ─────────────────────────────────────────────────────────
-       Skill 32: Design Tokens & Dynamic Tier Variables
+       Design Tokens & Dynamic Tier Variables
        ───────────────────────────────────────────────────────── */
     :root {
       --color-primary: #00D2BE;
-      --color-primary-hover: rgba(0,210,190,0.8);
-      --color-primary-pressed: rgba(0,210,190,0.4);
-      --color-primary-disabled: rgba(71,71,71,0.2);
       --color-surface: #191919;
       --color-surface-container: #232323;
       --color-surface-variant: rgba(71,71,71,0.4);
@@ -34,18 +31,15 @@
       --tier-glow: rgba(224, 224, 224, 0.15);
 
       --font-family: 'PingFang TC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      --font-weight-regular: 400;
       --font-weight-semibold: 600;
-      --font-headline-large: 36px;
       --font-headline-small: 28px;
       --font-title-large: 22px;
-      --font-title-medium: 20px;
       --font-body-large: 16px;
       --font-body-medium: 14px;
       --font-body-small: 12px;
 
       --spacing-2: 4px; --spacing-3: 8px; --spacing-4: 12px;
-      --spacing-5: 16px; --spacing-6: 24px; --spacing-7: 32px;
+      --spacing-5: 16px; --spacing-6: 24px;
 
       --radius-s: 8px; --radius-m: 12px; --radius-l: 16px; --radius-full: 1000px;
     }
@@ -76,7 +70,7 @@
     .subtitle { font-size: var(--font-body-medium); color: var(--color-on-primary-2); text-align: center; margin-bottom: var(--spacing-5); line-height: 1.5; }
 
     /* ─────────────────────────────────────────────────────────
-       FOMO Marquee (轉換率引擎：社會認同)
+       FOMO Marquee (社會認同)
        ───────────────────────────────────────────────────────── */
     .marquee-wrapper {
       background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
@@ -97,7 +91,7 @@
     @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-150%); } }
 
     /* ─────────────────────────────────────────────────────────
-       Luxury Glassmorphism Cards
+       Glassmorphism Cards
        ───────────────────────────────────────────────────────── */
     .card {
       background: linear-gradient(145deg, rgba(35, 35, 35, 0.8) 0%, rgba(25, 25, 25, 0.9) 100%);
@@ -122,8 +116,6 @@
       border-radius: var(--radius-m);
       padding: var(--spacing-4);
       text-align: center;
-      position: relative;
-      overflow: hidden;
     }
     .stat-label { font-size: var(--font-body-small); color: var(--color-on-primary-2); margin-bottom: var(--spacing-2); }
     .stat-value { font-size: var(--font-title-large); font-weight: var(--font-weight-semibold); color: var(--color-on-primary-1); }
@@ -139,7 +131,7 @@
     }
 
     /* ─────────────────────────────────────────────────────────
-       Premium Buttons
+       Buttons
        ───────────────────────────────────────────────────────── */
     .btn {
       width: 100%; padding: var(--spacing-4); border: none; border-radius: var(--radius-full);
@@ -159,19 +151,18 @@
       color: #fff; 
       border: 1px solid rgba(255,255,255,0.2);
       box-shadow: 0 4px 15px var(--tier-glow);
-      animation: pulse 2s infinite;
     }
-    .btn-primary:disabled { 
-      background: var(--color-surface-container); color: var(--color-on-primary-disabled); 
-      border: 1px solid var(--color-outline); box-shadow: none; animation: none; cursor: not-allowed; 
-    }
-    
-    /* 掃光特效 */
-    .btn-primary::after {
+    /* 發光動畫僅在按鈕可用時顯示 */
+    .btn-primary:not(:disabled) { animation: pulse 2s infinite; }
+    .btn-primary:not(:disabled)::after {
       content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
       background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
       transform: rotate(30deg) translateX(-100%);
       animation: shimmer 3s infinite;
+    }
+    .btn-primary:disabled { 
+      background: var(--color-surface-container); color: var(--color-on-primary-disabled); 
+      border: 1px solid var(--color-outline); box-shadow: none; cursor: not-allowed; 
     }
 
     @keyframes pulse { 0% { box-shadow: 0 0 0 0 var(--tier-glow); } 70% { box-shadow: 0 0 0 10px rgba(0,0,0,0); } 100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); } }
@@ -187,7 +178,6 @@
       position: relative; width: 310px; height: 310px; margin: 0 auto var(--spacing-6);
     }
     
-    /* 外圍發光環 */
     .wheel-border {
       position: absolute; top: -5px; left: -5px; right: -5px; bottom: -5px;
       border-radius: 50%; background: linear-gradient(135deg, var(--tier-color), transparent, var(--tier-color));
@@ -199,7 +189,7 @@
       width: 100%; height: 100%; border-radius: 50%;
       border: 6px solid #1a1a1a; position: relative; overflow: hidden;
       box-shadow: 0 0 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5);
-      z-index: 2; transition: transform 5s cubic-bezier(0.1, 0.9, 0.1, 1); 
+      z-index: 2; transition: transform 5s cubic-bezier(0.15, 0.95, 0.1, 1); 
     }
     
     .pointer {
@@ -218,12 +208,23 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.2);
     }
 
+    /* 🔥 修正獎項文字對齊與定位 🔥 */
     .slice-label {
-      position: absolute; top: 50%; left: 50%; width: 140px; 
-      transform-origin: 0 50%; text-align: right; padding-right: 22px;
-      font-size: 11px; font-weight: var(--font-weight-semibold); color: var(--color-on-primary-1);
-      z-index: 2; text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      position: absolute; 
+      top: 50%; 
+      left: 50%; 
+      width: 130px; /* 控制文字延伸的長度 */
+      transform-origin: 0 50%; /* 軸心設在左側中點 (也就是輪盤正中心) */
+      text-align: left; /* 文字由中心向外排列 */
+      padding-left: 42px; /* 避開中心的圓圈，讓文字不要被遮擋 */
+      font-size: 11px; 
+      font-weight: var(--font-weight-semibold); 
+      color: var(--color-on-primary-1);
+      z-index: 2; 
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+      white-space: nowrap; 
+      overflow: hidden; 
+      text-overflow: ellipsis;
     }
 
     /* ─────────────────────────────────────────────────────────
@@ -250,7 +251,6 @@
     .prize-icon { font-size: 72px; margin-bottom: var(--spacing-3); filter: drop-shadow(0 0 10px var(--tier-color)); animation: bounce 2s infinite; }
     @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
-    /* Pure CSS Confetti Container */
     #confetti-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 0; }
     .confetti-piece { position: absolute; width: 8px; height: 16px; opacity: 0.8; animation: fall linear forwards; }
     @keyframes fall { 0% { transform: translateY(-20px) rotate(0deg); opacity: 1; } 100% { transform: translateY(120vh) rotate(720deg); opacity: 0; } }
@@ -327,7 +327,7 @@
         </div>
       </div>
 
-      <div id="arena" style="display: none; animation: fadeIn 0.5s;">
+      <div id="arena">
         <div class="arena-title" id="arena-title">--轉盤--</div>
         <div class="arena-desc" id="arena-desc">--文案--</div>
 
@@ -339,7 +339,7 @@
         </div>
 
         <button class="btn btn-primary" id="btn-spin" onclick="spinWheel()">
-          🎯 立即抽獎 (消耗 1 張)
+          🎯 抽獎券不足，請先兌換
         </button>
       </div>
 
@@ -359,9 +359,6 @@
   </div>
 
   <script>
-    /* ─────────────────────────────────────────────────────────
-       活動配置與獎項設定
-       ───────────────────────────────────────────────────────── */
     const EVENT_CONFIG = {
       exchangeRate: 5200,
       tiers: {
@@ -412,15 +409,12 @@
 
     let state = { level: 0, diamonds: 0, tickets: 0, currentTier: null, isSpinning: false, currentRotation: 0 };
 
-    /* ─────────────────────────────────────────────────────────
-       SWAG Iframe Initializer & Dev Mode
-       ───────────────────────────────────────────────────────── */
+    /* Dev Mode Initializer */
     const urlParams = new URLSearchParams(window.location.search);
     const isDevMode = urlParams.get('test-mode') === '1' || window.self === window.top;
 
     document.addEventListener('DOMContentLoaded', () => {
       if (isDevMode) initDevMode();
-      // 在實際環境中這裡會接續原有的 postMessage 邏輯
     });
 
     function initDevMode() {
@@ -453,13 +447,21 @@
       }, 400);
     }
 
-    /* ─────────────────────────────────────────────────────────
-       Core Rendering & Interactions
-       ───────────────────────────────────────────────────────── */
     function determineTier(level) {
       if (level >= EVENT_CONFIG.tiers.black.minLv) return EVENT_CONFIG.tiers.black;
       if (level >= EVENT_CONFIG.tiers.gold.minLv) return EVENT_CONFIG.tiers.gold;
       return EVENT_CONFIG.tiers.silver;
+    }
+
+    function updateSpinButtonState() {
+      const btn = document.getElementById('btn-spin');
+      if (state.tickets > 0) {
+        btn.disabled = false;
+        btn.textContent = '🎯 立即抽獎 (消耗 1 張)';
+      } else {
+        btn.disabled = true;
+        btn.textContent = '🎯 抽獎券不足，請先兌換';
+      }
     }
 
     function renderApp() {
@@ -477,13 +479,10 @@
       document.getElementById('arena-desc').textContent = state.currentTier.desc;
       
       drawWheel(state.currentTier.prizes);
+      updateSpinButtonState();
 
       document.getElementById('loading-state').style.display = 'none';
       document.getElementById('ready-state').style.display = 'block';
-      document.getElementById('arena').style.display = state.tickets > 0 ? 'block' : 'none';
-      
-      // Toggle Marquee visibility based on arena status to avoid screen clutter
-      document.querySelector('.marquee-wrapper').style.display = state.tickets > 0 ? 'none' : 'block';
     }
 
     function handleExchange() {
@@ -492,7 +491,6 @@
         return;
       }
       
-      // 雙重防呆確認 (依照企劃需求)
       if (confirm("確認要將目前的達標紀錄兌換成抽獎券嗎？")) {
         if (confirm("⚠️ 再次確認！\n兌換後不會扣除實際鑽石餘額，僅作為資格計算。\n確定執行？")) {
           const newTickets = Math.floor(state.diamonds / EVENT_CONFIG.exchangeRate);
@@ -502,14 +500,11 @@
           alert(`🎉 兌換成功！獲得 ${newTickets} 張轉盤券！`);
           renderApp();
           // 平滑滾動至輪盤區
-          setTimeout(() => document.getElementById('arena').scrollIntoView({behavior: 'smooth'}), 100);
+          setTimeout(() => document.getElementById('arena').scrollIntoView({behavior: 'smooth', block: 'center'}), 100);
         }
       }
     }
 
-    /* ─────────────────────────────────────────────────────────
-       Roulette Wheel Logic
-       ───────────────────────────────────────────────────────── */
     function drawWheel(prizes) {
       const wheel = document.getElementById('wheel');
       wheel.innerHTML = ''; 
@@ -522,18 +517,19 @@
         const endAngle = (index + 1) * sliceAngle;
         
         const bgColor = index % 2 === 0 ? '#1f1f1f' : '#2a2a2a';
-        // 大賞區塊給予特別底色標示
         const finalBgColor = prize.highlight ? 'rgba(255,255,255,0.1)' : bgColor;
         
         gradientParts.push(`${finalBgColor} ${startAngle}deg ${endAngle}deg`);
 
-        const labelAngle = startAngle + (sliceAngle / 2);
+        // 🔥 關鍵修正：計算每個扇形的中心角度
+        const centerAngle = startAngle + (sliceAngle / 2);
+        
         const label = document.createElement('div');
         label.className = 'slice-label';
-        label.style.transform = `translate(-100%, -50%) rotate(${labelAngle - 180}deg)`;
-        label.style.left = '50%';
         
-        // 大賞加上皇冠與特定顏色
+        // 🔥 關鍵修正：減去 90 度，抵銷 CSS gradient (0度=上) 與 transform (0度=右) 的差異
+        label.style.transform = `translateY(-50%) rotate(${centerAngle - 90}deg)`;
+        
         if (prize.highlight) {
           label.innerHTML = `👑 <span style="color:var(--tier-color)">${prize.name}</span>`;
         } else {
@@ -571,7 +567,6 @@
       state.currentRotation += spins + targetAngle;
 
       const wheel = document.getElementById('wheel');
-      // 改良貝茲曲線，創造「猛烈加速後緩慢停止」的懸疑感
       wheel.style.transition = 'transform 5s cubic-bezier(0.15, 0.95, 0.1, 1)';
       wheel.style.transform = `rotate(${state.currentRotation}deg)`;
 
@@ -583,21 +578,11 @@
         showModal(prizes[winningIndex]);
         
         state.isSpinning = false;
-        btn.textContent = '🎯 立即抽獎 (消耗 1 張)';
-        btn.disabled = state.tickets <= 0;
-        
-        if(state.tickets <= 0) {
-           setTimeout(() => {
-             document.getElementById('arena').style.display = 'none';
-             document.querySelector('.marquee-wrapper').style.display = 'block';
-           }, 1000);
-        }
+        updateSpinButtonState();
       }, 5050);
     }
 
-    /* ─────────────────────────────────────────────────────────
-       Modal & Confetti FX
-       ───────────────────────────────────────────────────────── */
+    /* Modal & Confetti FX */
     function showModal(prize) {
       document.getElementById('prize-name').textContent = prize.name;
       document.getElementById('prize-name').style.color = state.currentTier.color;
@@ -608,7 +593,7 @@
 
     function closeModal() {
       document.getElementById('prize-modal').classList.remove('active');
-      document.getElementById('confetti-container').innerHTML = ''; // 清除碎紙花
+      document.getElementById('confetti-container').innerHTML = '';
     }
 
     function createConfetti() {
